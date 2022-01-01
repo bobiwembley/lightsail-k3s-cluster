@@ -62,6 +62,28 @@ resource "aws_lightsail_instance_public_ports" "k3s-fw-rules-manager" {
       cidrs     = ["90.3.135.36/32"]
 
   }
+
+   port_info {
+      protocol  = "tcp"
+      from_port = 80
+      to_port   = 80
+
+  }
+
+ port_info {
+      protocol  = "tcp"
+      from_port = 443
+      to_port   = 443
+
+  }
+
+   port_info {
+      protocol  = "tcp"
+      from_port = 8001
+      to_port   = 8001
+      cidrs     = ["90.3.135.36/32"]
+
+  }
 }
 
 
