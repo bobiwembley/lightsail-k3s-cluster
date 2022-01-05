@@ -22,7 +22,7 @@ resource "aws_lightsail_instance" "k3s-manager" {
  
  resource "aws_lightsail_instance" "k3s-worker" {
   count              = var.instance_count
-  availability_zone  = "${element(split(",", var.availability_zones), count.index)}"
+  availability_zone  = var.availability_zones[count.index]
   blueprint_id       = "ubuntu_20_04"
   name               = "k3s_worker${count.index + 1}"
   bundle_id          = "micro_2_0"
