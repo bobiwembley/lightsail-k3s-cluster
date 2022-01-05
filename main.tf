@@ -1,13 +1,25 @@
+resource "aws_lightsail_static_ip" "k3s-manager-ip" {
+  name      = "k3s-manager-ip"
+  depends_on = [    aws_lightsail_instance.k3s-manager  ]
+}
+resource "aws_lightsail_static_ip_attachment" "manager" {
+   static_ip_name = "${aws_lightsail_static_ip.k3s-manager-ip.name}"
+   instance_name  = "${aws_lightsail_instance.k3s-manager.name}"
+   depends_on     = [    aws_lightsail_instance.k3s-manager  ]
 
+}
 resource "aws_lightsail_instance" "k3s-manager" {
   name               =  "k3s-manager"
   availability_zone  = "${var.region}a"
   blueprint_id       = "ubuntu_20_04"
   bundle_id          = "micro_2_0"
   key_pair_name      = "LightsailDefaultKeyPair"
-  user_data          =  file("setup/k3s-setup-manager.sh")
+  user_data          = file("setup/k3s-setup-manager.sh")
+
 
 }
+
+
 
 
 resource "aws_lightsail_instance" "k3s-worker1" {
@@ -20,8 +32,6 @@ resource "aws_lightsail_instance" "k3s-worker1" {
               
 }
 
-
-
 resource "aws_lightsail_instance" "k3s-worker2" {
   name              = "k3s-worker2"
   availability_zone = "${var.region}c"
@@ -33,6 +43,7 @@ resource "aws_lightsail_instance" "k3s-worker2" {
  
 }
 
+
 resource "aws_lightsail_instance" "k3s-worker3" {
   name              = "k3s-worker3"
   availability_zone = "${var.region}d"
@@ -43,7 +54,6 @@ resource "aws_lightsail_instance" "k3s-worker3" {
 
 
 }
-
 resource "aws_lightsail_instance_public_ports" "k3s-fw-rules-manager" {
   instance_name    = aws_lightsail_instance.k3s-manager.name
 
@@ -51,7 +61,7 @@ resource "aws_lightsail_instance_public_ports" "k3s-fw-rules-manager" {
       protocol  = "tcp"
       from_port = 6443
       to_port   = 6443
-      cidrs     = ["90.3.135.36/32"]
+      cidrs     = ["90.3.135.36/32", "${aws_lightsail_instance.k3s-worker1.public_ip_address}/32", "${aws_lightsail_instance.k3s-worker2.public_ip_address}/32", "${aws_lightsail_instance.k3s-worker3.public_ip_address}/32" ]
 
   }
 
